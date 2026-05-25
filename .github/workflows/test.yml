@@ -11,7 +11,7 @@ jobs:
     if: ${{ ! github.event._SKIPTEST }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - run: npm ci
     - run: npm test
 
@@ -23,7 +23,7 @@ jobs:
         echo "GRAFANA_API_HOST=${{ vars.GRAFANA_API_HOST }}" >> $GITHUB_ENV
         echo "GRAFANA_DASHID=${{ vars.GRAFANA_DASHID }}" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: ./
       with:
         apiHost: ${{ env.GRAFANA_API_HOST }}

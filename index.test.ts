@@ -1,9 +1,18 @@
-import { run } from './index';
 import { GrafanaClient } from './grafana';
-import * as core from '@actions/core';
+
+jest.mock('@actions/core', () => ({
+  getInput: jest.fn((name: string) => process.env[`INPUT_${name.toUpperCase()}`] || ''),
+  info: jest.fn(),
+  setFailed: jest.fn(),
+}));
+
+import { run } from './index';
 
 jest.mock('./grafana');
 const mockedGrafanaClient = GrafanaClient as unknown as jest.Mock<typeof GrafanaClient>;
+const mockedCore = jest.requireMock('@actions/core') as {
+  setFailed: jest.Mock;
+};
 
 process.env.INPUT_APIHOST = 'https://grafana.example.com';
 process.env.INPUT_APITOKEN = 'TOKEN';
@@ -23,7 +32,6 @@ it('should create annotation', async () => {
 });
 
 it('should fail when annotation creation throws', async () => {
-  const setFailedSpy = jest.spyOn(core, 'setFailed').mockImplementation();
   const mockCreateAnnotation = jest.fn().mockRejectedValue(new Error('failed to create annotation'));
   const mockConstructor = jest.fn().mockReturnValue({
     createAnnotation: mockCreateAnnotation,
@@ -32,7 +40,7 @@ it('should fail when annotation creation throws', async () => {
 
   await run();
 
-  expect(setFailedSpy).toHaveBeenCalledWith('failed to create annotation');
+  expect(mockedCore.setFailed).toHaveBeenCalledWith('failed to create annotation');
 });
 
 

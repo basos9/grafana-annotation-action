@@ -31,7 +31,8 @@ export const run = async (): Promise<void> => {
     core.info(`Created annotation ${annotationId}`);
   }
   catch (error) {
-    core.setFailed(error.message);
+    const message = error instanceof Error ? error.message : String(error);
+    core.setFailed(message);
   }
 };
 
